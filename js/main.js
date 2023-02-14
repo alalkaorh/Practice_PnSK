@@ -7,49 +7,56 @@
     
         <div class="product-info">
             <h1>{{ title }}</h1>
+            <p> {{ description }}</p>
             <p v-if="inStock">In stock</p>
             <p v-else>Out of Stock</p>
+            <span v-show="OnSile"</span>
         <ul>
             <li v-for="detail in details">{{ detail }}</li>
-         </ul>
-         
+        </ul>
             
-            
+        <ul>
+            <li v-for="size in sizes">{{ size }}</li>
+        </ul>
+                  
     
             <div
                     class="color-box"
                     v-for="(variant, index) in variants"
                     :key="variant.variantId"
                     :style="{ backgroundColor:variant.variantColor }"
-                    @mouseover="updateProduct(index)"
-            ></div>
-            <p>Доставка: {{ shipping }}</p>
-            <div class="cart">
-                <p>Cart({{ cart }})</p>
+                    @mouseover="updateProduct(index)">
             </div>
-    
-            <button
-                    v-on:click="addToCart"
-                    :disabled="!inStock"
-                    :class="{ disabledButton: !inStock }"
-            >
+                 <p>Delivery: {{ shipping }}</p>
+                    <a href="https://www.amazon.com/s/ref=nb_sb_noss?url=search-alias%3Daps&field-keywords=socks"> {{ link }}</a><br>
+                <div class="cart">   
+                   
+                <button
+                @click="addToCart"
+                :disabled="!inStock"
+                :class="{ disabledButton: !inStock }">
                 Add to cart
-            </button>
+                </button>
+                <button :disabled="cart <= 0" :class="{ disabledButton: cart <= 0 }" @click ="deleteFromCart(cart)">Delete</button>
+                </div>
+     
+
         </div>
     </div>
  `,
     data() {
         return {
             product: "Socks",
+            description : "A pair of warm, fuzzy socks.",
             selectedVariant: 0,
             altText: "A pair of socks",
+            link: "More products like this.",
             brand: 'Vue Mastery',
-            OnSale: true,
+            OnSale: false,
             details: ['80% cotton', '20% polyester', 'Gender-neutral'],
             variants: [{variantId: 2234, variantColor: 'green', variantImage: "./assets/vmSocks-green-onWhite.jpg", variantQuantity: 15}, 
                         {variantId: 2235, variantColor: 'blue', variantImage: "./assets/vmSocks-blue-onWhite.jpg", variantQuantity: 5}],
             sizes: ['S', 'M', 'L', 'XL', 'XXL', 'XXXL'],
-            cart: 1,
         }
     },
     props: {
@@ -58,14 +65,22 @@
             required: true
         }
     },
-        methods: {
-            addToCart() {
-                this.cart += 1
-            },
-            updateProduct(index) {
-                this.selectedVariant = index;
-                console.log(index);
-            }
+    
+    methods: {
+        updateProduct(index) {
+            this.selectedVariant = index;
+            console.log(index);
+        },
+        addToCart() {
+            this.$emit('add-to-cart', this.variants[this.selectedVariant].variantId);
+         },
+         deleteFormCart() {
+            this.cart -=1
+            this.$emit('add-to-cart', this.variants[this.selectedVariant].variantId);
+         },
+         
+         
+           
         },
         computed: {
             title() {
@@ -79,7 +94,7 @@
             },
             shipping() { 
                 if (this.premium) {
-                    return "бесплатно";
+                    return "FREE";
                 } else {
                     return 2.99
                 }
@@ -88,12 +103,21 @@
 
  })
 
+
  let app = new Vue({
     el: '#app',
     data: {
-        premium: true
+        premium: true,
+        cart: []
+    },
+    methods: {
+        updateCart(id) {
+            this.cart.push(id);
+        }
     }
  })
+ 
+ 
  
 
  
