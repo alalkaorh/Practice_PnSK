@@ -10,6 +10,7 @@
             <p> {{ description }}</p>
             <p v-if="inStock">In stock</p>
             <p v-else>Out of Stock</p>
+            <p>{{ sale }}</p>
             <p
                 v-else
                 :class="{ outOffStock: !inStock }"
@@ -59,8 +60,7 @@
             altText: "A pair of socks",
             link: "More products like this.",
             brand: 'Vue Mastery',
-            // OnSale: false,
-            OnSale: 'On sale',
+            onSale: true,
             details: ['80% cotton', '20% polyester', 'Gender-neutral'],
             variants: [{variantId: 2234, variantColor: 'green', variantImage: "./assets/vmSocks-green-onWhite.jpg", variantQuantity: 15}, 
                         {variantId: 2235, variantColor: 'blue', variantImage: "./assets/vmSocks-blue-onWhite.jpg", variantQuantity: 0}],
@@ -108,6 +108,12 @@
                     return 2.99
                 }
             },
+            sale() {
+                if (this.onSale) {
+                    return this.brand + ' ' + this.product + ' are on sale!'
+                }
+                return  this.brand + ' ' + this.product + ' are not on sale'
+            }
          
         }
 
