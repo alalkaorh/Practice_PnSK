@@ -41,129 +41,99 @@ Vue.component('product-review', {
 
     
   `,
-  data() {
-    return {
-        name: null,
-        review: null,
-        rating: null,
-        recommend: null,
-        errors: []
-    }
-},
-methods:{
-    onSubmit() {
-        this.errors = []
-        if(this.name && this.review && this.rating) {
-            let productReview = {
-                name: this.name,
-                review: this.review,
-                rating: this.rating,
+    data() {
+        return {
+            name: null,
+            review: null,
+            rating: null,
+            recommend: null,
+            errors: []
+        }
+    },
+    methods: {
+        onSubmit() {
+            this.errors = []
+            if (this.name && this.review && this.rating) {
+                let productReview = {
+                    name: this.name,
+                    review: this.review,
+                    rating: this.rating,
                     recommend: this.recommend
+                }
+                this.$emit('review-submitted', productReview)
+                this.name = null
+                this.review = null
+                this.rating = null
+                this.recommend = null
+
+            } else {
+                if (!this.name) this.errors.push("Name required.")
+                if (!this.review) this.errors.push("Review required.")
+                if (!this.rating) this.errors.push("Rating required.")
+                if (!this.recommend) this.errors.push("Recommendation required.")
             }
-            this.$emit('review-submitted', productReview)
-            this.name = null
-            this.review = null
-            this.rating = null
-            this.recommend = null
-            
-        } else {
-            if(!this.name) this.errors.push("Name required.")
-            if(!this.review) this.errors.push("Review required.")
-            if(!this.rating) this.errors.push("Rating required.")
-            if(!this.recommend) this.errors.push("Recommendation required.")
         }
     }
-}
 })
 
 
- 
-
-
- Vue.component('product', {
+Vue.component('product', {
     template: `
-    <div class="product">
-        <div class="product-image">
-            <img :src="image" :alt="altText"/>
-        </div>
-    
-        <div class="product-info">
-            <h1>{{ title }}</h1>
-            <p> {{ description }}</p>
-            <p v-if="inStock">In stock</p>
-            <p v-else>Out of Stock</p>
-            <p>{{ sale }}</p>
-            <a href="https://www.amazon.com/s/ref=nb_sb_noss?url=search-alias%3Daps&field-keywords=socks"> {{ link }}</a><br>
-            <span v-show="OnSile"</span>
-            <product-details :details="details"></product-details>
-            
-        
-            
-        <ul>
-            <li v-for="size in sizes">{{ size }}</li>
-        </ul>
-        
-         
-    
-            <div
-                    class="color-box"
-                    v-for="(variant, index) in variants"
-                    :key="variant.variantId"
-                    :style="{ backgroundColor:variant.variantColor }"
-                    @mouseover="updateProduct(index)">
+   <div class="product">
+            <div class="product-image">
+                <img :src="image" :alt="altText" />
             </div>
-                 
-                    
-                <div class="cart">   
-                   
-                <button
-                @click="addToCart"
-                :disabled="!inStock"
-                :class="{ disabledButton: !inStock }">
-                Add to cart
-                </button>
-
-                <button 
-                   
-                    @click="removeToCart"
+            <div class="product-info">
+                <h1>{{ sale }}</h1>
+                <p>{{ description  }}</p>
+                 <detail-tabs :shipping="shipping" :details="details"></detail-tabs>
+                <p v-if="variants[this.selectedVariant].variantQuantity > 10">In stock</p>
+                <p v-else-if="variants[this.selectedVariant].variantQuantity <= 10 && variants[this.selectedVariant].variantQuantity > 0">Almost sold out!</p>
+                <p v-else :class="{ out_of_stock: !inStock }">Out of stock</p>
+                <a :href="link">More products like this</a>
+                <div
+                        class="color-box"
+                        v-for="(variant, index) in variants"
+                        :key="variant.variantId"
+                        :style="{ backgroundColor:variant.variantColor }"
+                        @mouseover="updateProduct(index)"
                 >
-
-                Remove from cart
-                
-                </button>
-                
                 </div>
-            <div>
-                
                 <ul>
-                <li v-for="review in reviews">
-                <p>{{ review.name }}</p>
-                <p>Rating: {{ review.rating }}</p>
-                <p>{{ review.review }}</p>
-                </li>
+                    <li v-for="size in sizes" :key="sizes">{{size}}</li>
                 </ul>
-                 
-                </div>
-
+                 <button @click="addToCart"
+                        :disabled="!inStock"
+                        :class="{ disabledButton: !inStock }">Add to cart</button>
+                <button @click="removeFromCart">Remove from cart</button><br>
+                
+                  <product-tabs :reviews="reviews"></product-tabs>
+                    </div>
         </div>
-        <product-review @review-submitted="addReview"></product-review> 
-        <info-tabs :shipping="shipping" :details="details"></info-tabs>
-    </div>
  `,
 //  <h2>Reviews</h2> между 136/137
     data() {
         return {
             product: "Socks",
-            description : "A pair of warm, fuzzy socks.",
+            description: "A pair of warm, fuzzy socks.",
             brand: 'Vue Mastery',
             selectedVariant: 0,
             altText: "A pair of socks",
-            link: "More products like this.",
-            brand: 'Vue Mastery',
-            onSale: false,
+            link: "https://www.amazon.com/s/ref=nb_sb_noss?url=search-alias%3Daps&field-keywords=socks",
+            onSale: true,
             details: ['80% cotton', '20% polyester', 'Gender-neutral'],
-            variants: [{variantId: 2234, variantColor: 'green', variantImage: "./assets/vmSocks-green-onWhite.jpg", variantQuantity: 15}, 
-                        {variantId: 2235, variantColor: 'blue', variantImage: "./assets/vmSocks-blue-onWhite.jpg", variantQuantity: 0}],
+            variants: [{
+                variantId: 2234,
+                variantColor: 'green',
+                variantImage: "./assets/vmSocks-green-onWhite.jpg",
+                variantQuantity: 15
+            },
+                {
+                    variantId: 2235,
+                    variantColor: 'blue',
+                    variantImage: "./assets/vmSocks-blue-onWhite.jpg",
+                    variantQuantity: 0
+                }],
             sizes: ['S', 'M', 'L', 'XL', 'XXL', 'XXXL'],
             reviews: []
         }
@@ -172,9 +142,13 @@ methods:{
         premium: {
             type: Boolean,
             required: true
-        }
+        },
     },
-    
+    cart: {
+        type: Number
+    },
+
+
     methods: {
         updateProduct(index) {
             this.selectedVariant = index;
@@ -183,57 +157,53 @@ methods:{
         addToCart() {
             this.$emit('add-to-cart',
                 this.variants[this.selectedVariant].variantId);
-         },
-         removeToCart() {
-            this.$emit('remove-to-cart',this.variants[this.selectedVariant].variantId)
+        },
+        removeToCart() {
+            this.$emit('remove-to-cart', this.variants[this.selectedVariant].variantId)
         },
         addReview(productReview) {
             this.reviews.push(productReview)
-         }
-         
-         
-        },
-        computed: {
-            title() {
-                return this.brand + ' ' + this.product;
-            },
-            image() {
-                return this.variants[this.selectedVariant].variantImage;
-            },
-            inStock(){
-                return this.variants[this.selectedVariant].variantQuantity
-            },
-            shipping() { 
-                if (this.premium) {
-                    return "FREE";
-                } else {
-                    return 2.99
-                }
-            },
-            sale() {
-                if (this.onSale) {
-                    return this.brand + ' ' + this.product + ' are on sale!'
-                }
-                return  this.brand + ' ' + this.product + ' are not on sale'
-            },
-            
-         
         }
 
- })
+
+    },
+    computed: {
+        title() {
+            return this.brand + ' ' + this.product;
+        },
+        image() {
+            return this.variants[this.selectedVariant].variantImage;
+        },
+        inStock() {
+            return this.variants[this.selectedVariant].variantQuantity
+        },
+        shipping() {
+            if (this.premium) {
+                return "FREE";
+            } else {
+                return 2.99
+            }
+        },
+        sale() {
+            if (this.onSale) {
+                return this.brand + ' ' + this.product + ' are on sale!'
+            }
+            return this.brand + ' ' + this.product + ' are not on sale'
+        },
 
 
+    }
+
+})
 
 
-
- Vue.component('product-details', {
+Vue.component('product-details', {
     props: {
         details: {
             type: Array,
-            required: false
         }
     },
-    template:`
+    template: `
            <ul>
                 <li v-for="detail in details">{{ detail }}</li>
            </ul>
@@ -280,11 +250,71 @@ Vue.component('info-tabs', {
     }
 })
 
+Vue.component('product-tabs', {
+    template: `
+    <div>   
+    <ul>
+      <span class="tab"
+            :class="{ activeTab: selectedTab === tab }"
+            v-for="(tab, index) in tabs"
+            @click="selectedTab = tab"
+      >{{ tab }}</span>
+    </ul>
+    <div v-show="selectedTab === 'Reviews'">
+       <h2>Reviews</h2>
+      <p v-if="!reviews.length">There are no reviews yet.</p>
+      <ul>
+        <li v-for="review in reviews">
+           <p>Name: {{ review.name }}</p>
+           <p>Rating: {{ review.rating }}</p>
+           <p>Review: {{ review.review }}</p>
+           <p>Radio: {{ review.radio }}</p>
+        </li>
+      </ul>
+    </div>
+    <div v-show="selectedTab === 'Make a Review'">
+     <product-review></product-review>
+    </div>
+    <div v-show="selectedTab === 'Shipping'">
+         <p>Shipping: {{ shipping }}</p>
+     </div>
+     <div v-show="selectedTab === 'Details'">
+         <product-details/>
+     </div>
+  </div>
+    `,
 
- 
+    data() {
+        return {
+            tabs: ['Reviews', 'Make a Review', 'Shipping', 'Details'],
+            selectedTab: 'Reviews'
+        }
+    },
+
+    props: {
+        reviews: {
+            type: Array,
+            required: false
+        },
+        premium: {
+            type: Boolean,
+            required: true
+
+        }
+    },
+    computed: {
+        shipping() {
+            if (this.premium) {
+                return "Free";
+            } else {
+                return 2.99
+            }
+        }
+    }
+})
 
 
- let app = new Vue({
+let app = new Vue({
     el: '#app',
     data: {
         premium: true,
@@ -293,17 +323,15 @@ Vue.component('info-tabs', {
     methods: {
         updateCart(id) {
             this.cart.push(id);
-            
+
         },
         removeCart() {
             this.cart.pop();
         },
-        
-         
 
 
     }
- })
+})
  
  
 
