@@ -18,9 +18,7 @@
                 Out of stock
             </p>
             <span v-show="OnSile"</span>
-        <ul>
-            <li v-for="detail in details">{{ detail }}</li>
-        </ul>
+            <product-details :details="details"></product-details>
             
         <ul>
             <li v-for="size in sizes">{{ size }}</li>
@@ -118,6 +116,20 @@
         }
 
  })
+
+ Vue.component('product-details', {
+    props: {
+        details: {
+            type: Array,
+            required: false
+        }
+    },
+    template:`
+           <ul>
+                <li v-for="detail in details">{{ detail }}</li>
+           </ul>
+      `
+})
 
 
  let app = new Vue({
