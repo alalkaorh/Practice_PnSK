@@ -37,7 +37,14 @@
                 Add to cart
                 </button>
 
-                <button v-on:click="removeToCart">Remove from cart</button>
+                <button 
+                   
+                    @click="removeToCart"
+                >
+
+                Remove from cart
+                
+                </button>
                 
                 </div>
      
@@ -74,10 +81,6 @@
             console.log(index);
         },
         addToCart() {
-            this.$emit('add-to-cart', this.variants[this.selectedVariant].variantId);
-         },
-         deleteFormCart() {
-            this.cart -=1
             this.$emit('add-to-cart', this.variants[this.selectedVariant].variantId);
          },
          removeToCart() {
@@ -139,17 +142,12 @@
     methods: {
         updateCart(id) {
             this.cart.push(id);
+            
         },
-         updateProduct(variantImage) {
-    this.image = variantImage
-
-        },removeCart(id) {
-            for (let i = this.cart.length - 1; i >= 0; i--) {
-                if (this.cart[i] === id) {
-                    this.cart.splice(i, 1);
-                }
-            }
+        removeCart() {
+            this.cart.pop();
         }
+
 
     }
  })
