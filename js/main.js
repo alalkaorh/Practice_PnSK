@@ -11,12 +11,6 @@
             <p v-if="inStock">In stock</p>
             <p v-else>Out of Stock</p>
             <p>{{ sale }}</p>
-            <p
-                v-else
-                :class="{ outOffStock: !inStock }"
-            >
-                Out of stock
-            </p>
             <span v-show="OnSile"</span>
             <product-details :details="details"></product-details>
             
@@ -42,7 +36,9 @@
                 :class="{ disabledButton: !inStock }">
                 Add to cart
                 </button>
-                <button :disabled="cart <= 0" :class="{ disabledButton: cart <= 0 }" @click ="deleteFromCart(cart)">Delete</button>
+
+                <button v-on:click="removeToCart">Remove from cart</button>
+                
                 </div>
      
 
@@ -84,10 +80,12 @@
             this.cart -=1
             this.$emit('add-to-cart', this.variants[this.selectedVariant].variantId);
          },
+         removeToCart() {
+            this.$emit('remove-to-cart',this.variants[this.selectedVariant].variantId)
+        }
       
          
          
-           
         },
         computed: {
             title() {
@@ -145,7 +143,13 @@
          updateProduct(variantImage) {
     this.image = variantImage
 
-        },
+        },removeCart(id) {
+            for (let i = this.cart.length - 1; i >= 0; i--) {
+                if (this.cart[i] === id) {
+                    this.cart.splice(i, 1);
+                }
+            }
+        }
 
     }
  })
