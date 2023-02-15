@@ -10,6 +10,12 @@
             <p> {{ description }}</p>
             <p v-if="inStock">In stock</p>
             <p v-else>Out of Stock</p>
+            <p
+                v-else
+                :class="{ outOffStock: !inStock }"
+            >
+                Out of stock
+            </p>
             <span v-show="OnSile"</span>
         <ul>
             <li v-for="detail in details">{{ detail }}</li>
@@ -48,14 +54,16 @@
         return {
             product: "Socks",
             description : "A pair of warm, fuzzy socks.",
+            brand: 'Vue Mastery',
             selectedVariant: 0,
             altText: "A pair of socks",
             link: "More products like this.",
             brand: 'Vue Mastery',
-            OnSale: false,
+            // OnSale: false,
+            OnSale: 'On sale',
             details: ['80% cotton', '20% polyester', 'Gender-neutral'],
             variants: [{variantId: 2234, variantColor: 'green', variantImage: "./assets/vmSocks-green-onWhite.jpg", variantQuantity: 15}, 
-                        {variantId: 2235, variantColor: 'blue', variantImage: "./assets/vmSocks-blue-onWhite.jpg", variantQuantity: 5}],
+                        {variantId: 2235, variantColor: 'blue', variantImage: "./assets/vmSocks-blue-onWhite.jpg", variantQuantity: 0}],
             sizes: ['S', 'M', 'L', 'XL', 'XXL', 'XXXL'],
         }
     },
@@ -78,6 +86,7 @@
             this.cart -=1
             this.$emit('add-to-cart', this.variants[this.selectedVariant].variantId);
          },
+      
          
          
            
@@ -98,7 +107,8 @@
                 } else {
                     return 2.99
                 }
-            }
+            },
+         
         }
 
  })
@@ -113,11 +123,16 @@
     methods: {
         updateCart(id) {
             this.cart.push(id);
-        }
+        },
+         updateProduct(variantImage) {
+    this.image = variantImage
+
+        },
+
     }
  })
  
- 
+
  
 
  
